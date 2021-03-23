@@ -142,7 +142,12 @@ const resolvers = {
   Mutation:{
     addBook: (root,args)=>{
       const newBook = {...args,id: uuid()}
-      console.log('find author',args.author)
+     
+      if(typeof(args.published)!== Number){
+         throw new UserInputError('Published year must be a number',{
+          invalidArgs: args.published,
+        })  
+      }
       if(!authors.find(a=>a.name ===args.author)){
          //!create new author
         const newAuthor = {name: args.author,id:uuid()}
