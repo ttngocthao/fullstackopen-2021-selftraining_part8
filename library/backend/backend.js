@@ -143,11 +143,12 @@ const resolvers = {
     addBook: (root,args)=>{
       const newBook = {...args,id: uuid()}
      
-      if(typeof(args.published)!== Number){
+      if(typeof(args.published)!== number){
          throw new UserInputError('Published year must be a number',{
           invalidArgs: args.published,
         })  
       }
+      
       if(!authors.find(a=>a.name ===args.author)){
          //!create new author
         const newAuthor = {name: args.author,id:uuid()}
