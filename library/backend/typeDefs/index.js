@@ -4,7 +4,7 @@ module.exports= gql`
   
   type Book {
       title: String!
-      author: String!
+      author: Author!
       published: Int!
       genres:[String!]!
       id: ID!
@@ -34,9 +34,9 @@ module.exports= gql`
       ):Book
       editAuthor(
         name: String!
-        setBornTo: Int
-
+        born: Int
       ):Author
+      addAuthor(name: String!, born: Int): Author
   }
 `
 

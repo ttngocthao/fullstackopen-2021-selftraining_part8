@@ -1,55 +1,61 @@
 const { UserInputError } = require('apollo-server')
 let authors = require('../mockData/authors')
-let books = require('../mockData/books')
+
 const { v4: uuid } = require('uuid');
+const Book = require('../models/Book')
+const Author = require('../models/Author')
 
 module.exports = {
   Query: {
-    bookCount: ()=> books.length,
-    authorCount: ()=> authors.length,
-    allBooks: (root,args)=>{
+    bookCount: ()=> Book.collection.countDocuments(),
+    authorCount: ()=> Author.collection.countDocuments(),
+    allBooks: async(root,args)=>{
+      const books = await Book.find({}).populate('author')
+      //if author exist
       if(args.author){
-        return books.filter(b=>b.author=== args.author)
+        const author = await Author.findOne({name: args.author})
+        return books.filter(b=>b.author.name === args.author)
       }
-      if(args.genre){
+            
+      if(args.genre){            
         return books.filter(b=>b.genres.indexOf(args.genre)>-1)
       }
+
       return books
     },
-    allAuthors: ()=> authors
+    allAuthors: ()=> Author.find({})
   },
   Mutation:{
-    addBook: (root,args)=>{
-      const newBook = {...args,id: uuid()}
-     
-      if(typeof(args.published)!== number){
-         throw new UserInputError('Published year must be a number',{
-          invalidArgs: args.published,
-        })  
-      }
-      
-      if(!authors.find(a=>a.name ===args.author)){
-         //!create new author
-        const newAuthor = {name: args.author,id:uuid()}
-        authors = [...authors,newAuthor]       
-      }
-      books = [...books, newBook]
-      return newBook
+    addAuthor: (root,args)=>{
+      const newAuthor = new Author({...args})
+      return newAuthor.save()
     },
-    editAuthor: (root,args)=>{
-      //! if the author exists
-      const author = authors.find(a=>a.name === args.name)
+    addBook: async(root,args)=>{     
+      let author = await Author.findOne({name: args.author})
+
+      if(!author){        
+        const newAuthor = new Author({name: args.author})
+        author = await newAuthor.save()
+      } 
+      const newBook = new Book({...args,author: author}) 
+      return newBook.save()
+    },
+    editAuthor: async(root,args)=>{
+      let author = await Author.findOneAndUpdate({name: args.name},{...args},{new: true})
       if(!author){
         throw new UserInputError('Author is not existed',{
           invalidArgs: args.name,
         })       
       }
-      const updatedAuthor = {...author, born:args.setBornTo}
-      authors = authors.map(a=>a.name===args.name ? updatedAuthor : a)
-      return updatedAuthor
+      return author
+    
     }
   },
   Author: {      
-    bookCount:(root)=>{ return books.filter(b=> b.author === root.name).length } 
-  }
+    bookCount:async(root)=>{ 
+      const books = await Book.find({author: root._id}).populate('author')
+      return books.length
+    } 
+  },
+
 }

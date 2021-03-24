@@ -41,7 +41,7 @@ export const EDIT_AUTHOR = gql`
   mutation updateAuthor ($name:String!,$born:Int){
     editAuthor (
       name: $name,
-      setBornTo: $born
+      born: $born
     ){
       name
       born

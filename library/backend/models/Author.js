@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
 const authorSchema = new mongoose.Schema({
-    name: {type: String,required: true,unique:true},
-    born: {type: Int, required: false},
+    name: {type: String,required: true,unique:true,minlength: 4},
+    born: {type: Number, required: false},
 })
 
 authorSchema.plugin(uniqueValidator)
