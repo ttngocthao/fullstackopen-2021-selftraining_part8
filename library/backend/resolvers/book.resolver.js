@@ -1,9 +1,11 @@
+const {AuthenticationError} = require('apollo-server')
 const Book = require('../models/Book')
 const Author = require('../models/Author')
 
 const  bookCount = () => Book.collection.countDocuments()
 
-const allBooks = async(root,args)=>{
+const allBooks = async(root,args,)=>{
+    
       const books = await Book.find({}).populate('author')
       //if author exist
       if(args.author){

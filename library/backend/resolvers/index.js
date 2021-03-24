@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
-const { UserInputError } = require('apollo-server')
+const jwt = require('jsonwebtoken')
+const { UserInputError,AuthenticationError } = require('apollo-server')
 const bookResolver = require ('./book.resolver')
 const authorResolver = require('./author.resolver')
 
@@ -12,10 +13,14 @@ module.exports = {
     bookCount: bookResolver.bookCount,
     allBooks: bookResolver.allBooks,
     authorCount: authorResolver.authorCount,   
-    allAuthors: authorResolver.allAuthors
+    allAuthors: authorResolver.allAuthors,
+    me: (root,args,context)=>{
+      return context.currentUser
+    }
   },
   Mutation:{
-    addAuthor: async(root,args)=>{
+    addAuthor: async(root,args,)=>{  
+
       const newAuthor = new Author({...args})
       try {
         await newAuthor.save()
@@ -24,7 +29,10 @@ module.exports = {
       }
       return newAuthor
     },
-    addBook: async(root,args)=>{     
+    addBook: async(root,args,{currentUser})=>{   
+       if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      } 
       let author = await Author.findOne({name: args.author})
       let newBook
       try {
@@ -42,7 +50,10 @@ module.exports = {
      
       return newBook
     },
-    editAuthor: async(root,args)=>{
+    editAuthor: async(root,args,{currentUser})=>{
+       if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      } 
       let author
       try {
          author = await Author.findOneAndUpdate({name: args.name},{...args},{new: true})
@@ -81,6 +92,27 @@ module.exports = {
       })
       //save to database
       return (await user).save()
+    },
+    login: async(root,args)=>{
+      //check user exists
+      let user = await User.findOne({username: args.username})
+      if(!user){
+        throw new UserInputError('User or password is not corrected',{...args})
+      }
+      //check password matched using compare method
+      const passwordMatched = await bcrypt.compare(args.password,user.passwordHash)
+      if(!passwordMatched){
+        throw new UserInputError('User or password is not corrected',{...args})
+      }
+
+      //generate token using username and id
+      const infoUsedForToken ={
+        username: user.username,
+        id: user._id
+      }
+
+      const token = jwt.sign(infoUsedForToken,process.env.TOKEN_SECRET)
+      return {value: token}
     }
   },
   Author: {      
