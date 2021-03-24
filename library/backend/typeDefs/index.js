@@ -2,6 +2,17 @@ const {  gql } = require('apollo-server')
 
 module.exports= gql`
   
+  type User {
+    username: String!
+    favoriteGenre: String!
+    passwordHash: String!
+    id: ID!
+  }
+
+  type Token{
+    value: String!
+  }
+
   type Book {
       title: String!
       author: Author!
@@ -22,6 +33,7 @@ module.exports= gql`
       authorCount: Int!
       allBooks(author: String,genre:String): [Book]
       allAuthors: [Author]
+      me: User
       
   }
   
@@ -37,6 +49,8 @@ module.exports= gql`
         born: Int
       ):Author
       addAuthor(name: String!, born: Int): Author
+      createUser(username: String!,password:String!,favoriteGenre: String!): User
+      login(username:String!,password:String!): Token
   }
 `
 

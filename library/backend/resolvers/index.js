@@ -1,29 +1,18 @@
+const bcrypt = require('bcrypt')
 const { UserInputError } = require('apollo-server')
-let authors = require('../mockData/authors')
+const bookResolver = require ('./book.resolver')
+const authorResolver = require('./author.resolver')
 
-const { v4: uuid } = require('uuid');
 const Book = require('../models/Book')
 const Author = require('../models/Author')
+const User = require('../models/User')
 
 module.exports = {
   Query: {
-    bookCount: ()=> Book.collection.countDocuments(),
-    authorCount: ()=> Author.collection.countDocuments(),
-    allBooks: async(root,args)=>{
-      const books = await Book.find({}).populate('author')
-      //if author exist
-      if(args.author){
-        const author = await Author.findOne({name: args.author})
-        return books.filter(b=>b.author.name === args.author)
-      }
-            
-      if(args.genre){            
-        return books.filter(b=>b.genres.indexOf(args.genre)>-1)
-      }
-
-      return books
-    },
-    allAuthors: ()=> Author.find({})
+    bookCount: bookResolver.bookCount,
+    allBooks: bookResolver.allBooks,
+    authorCount: authorResolver.authorCount,   
+    allAuthors: authorResolver.allAuthors
   },
   Mutation:{
     addAuthor: async(root,args)=>{
@@ -70,6 +59,28 @@ module.exports = {
       
       return author
     
+    },
+    createUser: async(root,args)=>{
+      //args =username: String!,password:String!,favoriteGenre:String!
+      //username:"Anousmyus",password:"123456"
+      //check username exist?
+      let user = await User.findOne({username:args.username})
+      
+      //if exist, return error message
+      if(user){
+        throw new UserInputError('Username exists',args.username)
+      }
+      //if not, hashed password
+      const saltRounds = 10;
+      const passwordHash = await bcrypt.hash(args.password,saltRounds)
+      //create new user
+      user = new User ({
+        username: args.username,
+        passwordHash: passwordHash,
+        favoriteGenre: args.favoriteGenre
+      })
+      //save to database
+      return (await user).save()
     }
   },
   Author: {      
