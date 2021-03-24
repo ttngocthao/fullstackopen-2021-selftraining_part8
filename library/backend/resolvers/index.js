@@ -26,27 +26,48 @@ module.exports = {
     allAuthors: ()=> Author.find({})
   },
   Mutation:{
-    addAuthor: (root,args)=>{
+    addAuthor: async(root,args)=>{
       const newAuthor = new Author({...args})
-      return newAuthor.save()
+      try {
+        await newAuthor.save()
+      } catch (error) {
+        throw new UserInputError(error.message,{invalidArgs: args})
+      }
+      return newAuthor
     },
     addBook: async(root,args)=>{     
       let author = await Author.findOne({name: args.author})
-
-      if(!author){        
-        const newAuthor = new Author({name: args.author})
-        author = await newAuthor.save()
-      } 
-      const newBook = new Book({...args,author: author}) 
-      return newBook.save()
+      let newBook
+      try {
+        if(!author){        
+          const newAuthor = new Author({name: args.author})
+          author = await newAuthor.save()
+        } 
+        newBook = new Book({...args,author: author}) 
+        await newBook.save()
+      } catch (error) {
+         throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+     
+      return newBook
     },
     editAuthor: async(root,args)=>{
-      let author = await Author.findOneAndUpdate({name: args.name},{...args},{new: true})
-      if(!author){
-        throw new UserInputError('Author is not existed',{
-          invalidArgs: args.name,
-        })       
-      }
+      let author
+      try {
+         author = await Author.findOneAndUpdate({name: args.name},{...args},{new: true})
+         if(!author){
+          throw new UserInputError('Author is not existed',{
+            invalidArgs: args.name,
+          })       
+        }
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }     
+      
       return author
     
     }
