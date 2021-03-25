@@ -14,3 +14,6 @@
 8.19 - 30 mins
 8.20 - 30min
 8.21 - 15 mins
+8.22 to 8.26 - 1h
+Optimally server structure: https://www.apollographql.com/blog/modularizing-your-graphql-schema-code-d7f71d5ed5f2/
+Optimally client structure: https://medium.com/@peterpme/thoughts-on-structuring-your-apollo-queries-mutations-939ba4746cd8
