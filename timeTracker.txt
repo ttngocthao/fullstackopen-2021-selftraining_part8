@@ -1,19 +1,20 @@
-8.1 - 15min
-8.2 - 15min
-8.3 - 30min
-8.4 to 8.5 - 15mins
-8.6 - 15mins
-8.7 - 15mins
-8.8 to 8.9 - 1h
-8.10 - 30mins
-8.11 to 8.12 - 1h30
-8.13 to 8.14 - 2h
-8.15 - 15 mins
-8.16 - 1h
-8.17 to 8.18 - 1h
-8.19 - 30 mins
-8.20 - 30min
+8.1 - 15minx
+8.2 - 15minx
+8.3 - 30minx
+8.4 to 8.5 - 15minsx
+8.6 - 15minsx
+8.7 - 15minsx
+8.8 to 8.9 - 1hx
+8.10 - 30minsx
+8.11 to 8.12 - 1h30x
+8.13 to 8.14 - 2hx
+8.15 - 15 minsx
+8.16 - 1hx
+8.17 to 8.18 - 1hx
+8.19 - 30 minsx
+8.20 - 30minsx
 8.21 - 15 mins
-8.22 to 8.26 - 1h
+8.22 to 8.26 - 1hx
+TOTAL: 10h45
 Optimally server structure: https://www.apollographql.com/blog/modularizing-your-graphql-schema-code-d7f71d5ed5f2/
 Optimally client structure: https://medium.com/@peterpme/thoughts-on-structuring-your-apollo-queries-mutations-939ba4746cd8
