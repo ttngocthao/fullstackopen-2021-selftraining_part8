@@ -5,7 +5,8 @@ import {ME,ALL_BOOKS} from '../queries'
 
 const Recommendations = ({show}) => {
    const {data: { me } = {}}=useQuery(ME)||{}
-   const {data: {allBooks}= []} = useQuery(ALL_BOOKS) || {}
+   //!filter using a graphql query to the server
+   const {data: {allBooks}= []} = useQuery(ALL_BOOKS,{variables:{genre: me ? me.favoriteGenre : null}}) || {}
   
     if(!show){
         return null
@@ -16,7 +17,7 @@ const Recommendations = ({show}) => {
             <h2>Recommendations</h2>
             {me && me.username}
             <p>Books in your favourite genre patterns</p>
-            <BookTable booksDisplay={allBooks.filter(b=>b.genres.indexOf(me.favoriteGenre)>-1)}/>
+            <BookTable booksDisplay={allBooks}/>
         </div>
     )
 }
