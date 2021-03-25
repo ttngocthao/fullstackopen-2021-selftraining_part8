@@ -3,7 +3,7 @@ import React,{useState} from 'react'
 import {useMutation,useQuery} from '@apollo/client'
 import {ALL_AUTHORS, EDIT_AUTHOR} from '../queries'
 
-const Authors = (props) => {
+const Authors = ({show,token}) => {
   
   const [name,setName]=useState('')
   const [born,setBorn]= useState('')
@@ -26,7 +26,7 @@ const Authors = (props) => {
     setBorn('')
   }
 
-  if (!props.show) {
+  if (!show) {
       return null
     }
   return (
@@ -52,7 +52,7 @@ const Authors = (props) => {
           )}
         </tbody>
       </table>
-      <div>
+      {token && <div>
         <h2>Set birth year</h2>
         <form onSubmit={updateAuthorHandle} >
            <label>name</label>
@@ -68,7 +68,8 @@ const Authors = (props) => {
           <input type='number' name='born' value={born} onChange={(e)=>setBorn(e.target.value)}/>
           <button type='submit'>Update author</button>
         </form>
-      </div>
+      </div>}
+      
     </div>
   )
 }
