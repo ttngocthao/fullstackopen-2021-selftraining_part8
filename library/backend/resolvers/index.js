@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { UserInputError,AuthenticationError } = require('apollo-server')
+const { UserInputError,AuthenticationError , PubSub} = require('apollo-server')
 const bookResolver = require ('./book.resolver')
 const authorResolver = require('./author.resolver')
 
 const Book = require('../models/Book')
 const Author = require('../models/Author')
 const User = require('../models/User')
+const pubsub = new PubSub()
 
 module.exports = {
   Query: {
@@ -47,7 +48,7 @@ module.exports = {
           invalidArgs: args,
         })
       }
-     
+      pubsub.publish('BOOK_ADDED',{bookAdded: newBook})
       return newBook
     },
     editAuthor: async(root,args,{currentUser})=>{
@@ -121,5 +122,9 @@ module.exports = {
       return books.length
     } 
   },
-
+  Subscription:{
+    bookAdded: {
+      subscribe: ()=>pubsub.asyncIterator(['BOOK_ADDED'])
+    }
+  }
 }
